@@ -1,0 +1,48 @@
+"""
+Fitbit API Configuration
+DO NOT commit the actual config.py file - it contains sensitive credentials
+Copy this file to config.py and fill in your actual values
+"""
+
+# Fitbit API Credentials
+# Obtain these from https://dev.fitbit.com/apps
+CLIENT_ID = 'YOUR_CLIENT_ID_HERE'
+CLIENT_SECRET = 'YOUR_CLIENT_SECRET_HERE'
+
+# OAuth Redirect URI
+# Must match exactly what's registered in your Fitbit app
+REDIRECT_URI = 'http://localhost:8080/'
+
+# API Scopes Required for ECG Data
+# DO NOT MODIFY unless you know what you're doing
+SCOPES = [
+    'heartrate',
+    'activity',
+    'electrocardiogram',
+    'respiratory_rate',
+    'oxygen_saturation',
+    'sleep'
+]
+
+# Token Storage
+# Tokens will be stored in fitbit/tokens/<participant_id>.json
+TOKEN_DIR = 'fitbit/tokens'
+
+# Data Export Directory
+# All participant data will be exported here
+EXPORT_DIR = 'fitbit_exports'
+
+# Study Configuration
+STUDY_NAME = 'AFib Monitoring Clinical Study'
+INSTITUTION = 'Sunnybrook Health Sciences Centre'
+
+# Compliance Targets
+DEFAULT_EXPECTED_ECGS_PER_DAY = 2
+TARGET_ADHERENCE_PERCENTAGE = 70
+STALE_ECG_THRESHOLD_DAYS = 2
+LOW_COMPLETION_THRESHOLD_PERCENTAGE = 30
+
+# Study Arms
+ABLATION_ARM_TARGET = 10
+CARDIOVERSION_ARM_TARGET = 10
+

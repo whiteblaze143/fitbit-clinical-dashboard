@@ -1,0 +1,6 @@
+studyId,firstName,lastName,phone,email,deviceId,status,startDate,endDate,expectedPerDay,notes
+ABL01,John,Doe,+1-555-0101,study-abl01@sunnybrook.ca,Sense2-001,enrolled,2025-01-15,2025-07-15,2,Post-ablation patient
+ABL02,Jane,Smith,+1-555-0102,study-abl02@sunnybrook.ca,Sense2-002,enrolled,2025-01-20,2025-07-20,2,Post-ablation patient
+CVR01,Bob,Johnson,+1-555-0201,study-cvr01@sunnybrook.ca,Sense2-003,enrolled,2025-01-25,2025-04-25,2,Post-cardioversion patient
+CVR02,Alice,Williams,+1-555-0202,study-cvr02@sunnybrook.ca,Sense2-004,invited,2025-02-01,2025-05-01,2,Post-cardioversion patient
+
