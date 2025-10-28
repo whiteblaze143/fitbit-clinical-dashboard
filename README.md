@@ -28,39 +28,6 @@ This dashboard was developed for the **Sunnybrook Health Sciences Centre AFib Mo
 
 ---
 
-## ✨ Key Features
-
-### 1. **Multi-Participant Dashboard**
-- Automatic detection of all participant directories
-- Real-time enrollment progress tracking (X/10 per arm)
-- Overall study adherence metrics
-
-### 2. **Compliance Monitoring**
-- **Active (48h)**: Participants with recent data
-- **Overall Adherence**: Percentage meeting daily targets
-- **7-Day Completion Rate**: Rolling weekly compliance
-- **Stale ECG Alerts**: Participants without recent submissions
-
-### 3. **ECG Waveform Analysis**
-- Interactive plotly visualizations
-- R-peak detection and heart rate calculation
-- HRV metrics (RMSSD, SDNN, pNN50)
-- Bandpass filtering (5-15 Hz)
-- Artifact marking and classification
-
-### 4. **Participant Management**
-- CRUD operations for participant registry
-- Device assignment tracking
-- Study ID management
-- Contact information storage
-
-### 5. **Batch Operations**
-- Export data for all participants with single command
-- Automated token management per participant
-- Progress logging and error reporting
-
----
-
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -210,7 +177,7 @@ fitbit_exports/
 
 ## 📈 Compliance Monitoring
 
-### Metrics Calculated:
+### Metrics:
 
 - **Observed ECGs**: Total recordings to date
 - **Expected ECGs**: Based on `(days_since_start × expected_per_day)`
@@ -290,64 +257,13 @@ fitbit-clinical-dashboard/
 
 ---
 
-## 🔬 Clinical Study Information
-
-**Principal Investigators**: Chris, Alex  
-**Study Coordinator**: Mithun  
-**Institution**: Sunnybrook Health Sciences Centre  
-**Study Type**: Observational, Prospective  
-**IRB Approval**: Required before enrollment  
-
----
-
-## 📝 Data Management
-
-### Data Storage:
-- ✅ **Local only** on Sunnybrook password-protected machines
-- ✅ **No cloud storage** (AWS, Google Cloud, etc.)
-- ✅ **HIPAA compliant** data handling
-- ✅ **Per-participant** data isolation
-
-### Data Retention:
-- Study data retained for minimum 7 years post-study
-- Participant withdrawal: data retained per protocol
-- Data destruction: secure deletion procedures
-
----
-
 ## 🤝 Contributing
-
-This is a clinical study tool. For questions or issues:
-
-1. **Technical Issues**: Contact Mithun (developer)
-2. **Clinical Questions**: Contact Chris or Alex (PIs)
-3. **IRB/Ethics**: Contact study coordinator
 
 ---
 
 ## 📄 License
 
 This software is developed for research purposes only. Not for clinical use without IRB approval.
-
-**© 2025 Sunnybrook Health Sciences Centre**
-
----
-
-## 🙏 Acknowledgments
-
-- **Fitbit API**: For device data access
-- **Streamlit**: For dashboard framework
-- **Plotly**: For interactive visualizations
-- **Sunnybrook IT**: For secure infrastructure support
-
----
-
-## 📞 Support
-
-For technical support or questions:
-- **Email**: your-email@sunnybrook.ca
-- **Meeting**: Scheduled weekly check-ins
-- **Documentation**: See `docs/` folder
 
 ---
 
