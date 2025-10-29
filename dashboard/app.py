@@ -642,11 +642,111 @@ with st.expander('Skin tone reference (Fitzpatrick-like)'):
     try:
         img_path = Path(__file__).resolve().parent / 'fitz_scale.jpg'
         if img_path.exists():
-            st.image(str(img_path), caption='Fitzpatrick-like self-report reference (for optional survey item)', use_column_width=True)
+            st.image(str(img_path), caption='Fitzpatrick-like self-report reference (for optional survey item)', use_container_width=True)
         else:
             st.info('Reference image not found: dashboard/fitz_scale.jpg')
     except Exception:
         st.info('Unable to load reference image on this machine.')
+
+# Full sociodemographic & tech-use survey (optional, extended)
+FULL_SURVEY_CSV = APP_DATA_DIR / 'sociodemographic_survey.csv'
+with st.expander('Full survey (optional, extended)'):
+    st.caption('Extended sociodemographic and technology-use questions (keep off by default to reduce burden).')
+    fs_col1, fs_col2 = st.columns(2)
+    with fs_col1:
+        fs_study_id = st.text_input('Study ID', key='fs_study_id')
+        fs_age = st.number_input('Age (years)', min_value=0, max_value=120, value=0, step=1)
+        fs_sex_birth = st.selectbox('Sex at birth', ['Prefer not to answer', 'Male', 'Female', 'Intersex'])
+        fs_gender = st.multiselect('Gender identity', ['Woman','Man','Non-binary','Two-spirit','Prefer to self-describe'], default=[])
+        fs_gender_other = st.text_input('If self-describe, specify')
+        fs_race = st.multiselect('Race/ethnicity (multi-select)', [
+            'Asian – East','Asian – South','Asian – Southeast',
+            'Black – African','Black – Caribbean','Black – North American',
+            'First Nations','Inuit','Métis','Latin American','Middle Eastern',
+            'White – European','White – North American','Other','Prefer not to answer'
+        ], default=[])
+        fs_race_other = st.text_input('If Other, specify race/ethnicity')
+        fs_lang_primary = st.text_input('Primary language (e.g., English)')
+        fs_lang_provider = st.text_input('Most comfortable language with provider')
+        fs_born_canada = st.selectbox('Born in Canada?', ['Prefer not to answer','Yes','No','Don’t know'])
+        fs_arrival_year = st.text_input('If no, year arrived (yyyy)')
+        fs_education = st.selectbox('Highest education', [
+            'Prefer not to answer','Less than primary','Completed primary','Some secondary','Completed secondary',
+            'Some college','College diploma','Some university','University degree','Graduate/professional'
+        ])
+    with fs_col2:
+        fs_marital = st.selectbox('Marital status', ['Prefer not to answer','Married/common-law','Separated','Widowed','Divorced','Never married'])
+        fs_living = st.selectbox('Living situation', [
+            'Prefer not to answer','One adult alone','One adult with children','Two adults no children','Two adults with children',
+            'Two+ related persons','Two+ unrelated persons','Two+ families','Other'
+        ])
+        fs_housing = st.selectbox('Housing type', [
+            'Prefer not to answer','House/apartment','Shelter/encampment/street/couch surfing','Long-term care',
+            'Retirement home','Group home','Correctional facility','Other'
+        ])
+        fs_employment = st.selectbox('Employment', [
+            'Prefer not to answer','Unemployed','Employed (incl. self-employed)','Volunteer','Retired','Student','Homemaker','Other','Don’t know'
+        ])
+        fs_income = st.selectbox('Household income (before tax)', [
+            'Prefer not to answer','Less than $20,000','$20,000 - $39,999','$40,000 - $69,999','$70,000 - $99,999','$100,000 - $149,999','Over $150,000','Don’t know'
+        ])
+        fs_home_internet = st.selectbox('Home internet', ['Prefer not to answer','Yes','No','Don’t know'])
+        fs_home_wifi = st.selectbox('Home Wi‑Fi', ['Prefer not to answer','Yes','No','Don’t know'])
+        fs_has_computer = st.selectbox('Computer at home', ['Prefer not to answer','Yes','No','Don’t know'])
+        fs_has_phone = st.selectbox('Own/use mobile phone', ['Prefer not to answer','Yes','No','Don’t know'])
+        fs_has_smartphone = st.selectbox('Own/use smartphone', ['Prefer not to answer','Yes','No','Don’t know'])
+        fs_phone_type = st.selectbox('If smartphone: type', ['N/A','Android','iPhone','Other','Don’t know'])
+        fs_prior_wearable = st.selectbox('Used a smartwatch/wearable before', ['Prefer not to answer','Yes','No','Don’t know'])
+        fs_prior_model = st.text_input('If yes: model/brand')
+        fs_tech_comfort = st.select_slider('Comfort with new technology', options=['Low','Medium','High'], value='Medium')
+
+    if st.button('Save full survey response'):
+        if not fs_study_id.strip():
+            st.warning('Study ID is required to save a full survey response.')
+        else:
+            try:
+                rec = pd.DataFrame([{ 
+                    'study_id': fs_study_id.strip(),
+                    'age_years': int(fs_age) if fs_age else None,
+                    'sex_at_birth': fs_sex_birth,
+                    'gender_identity': ';'.join(fs_gender) if fs_gender else ('self:' + fs_gender_other if fs_gender_other else ''),
+                    'race_ethnicity': ';'.join(fs_race) + (f";other:{fs_race_other}" if fs_race_other else '') if fs_race else (f"other:{fs_race_other}" if fs_race_other else ''),
+                    'language_primary': fs_lang_primary,
+                    'language_provider': fs_lang_provider,
+                    'born_canada': fs_born_canada,
+                    'arrival_year': fs_arrival_year,
+                    'education': fs_education,
+                    'marital_status': fs_marital,
+                    'living_situation': fs_living,
+                    'housing_type': fs_housing,
+                    'employment': fs_employment,
+                    'income_bracket': fs_income,
+                    'home_internet': fs_home_internet,
+                    'home_wifi': fs_home_wifi,
+                    'has_computer': fs_has_computer,
+                    'has_phone': fs_has_phone,
+                    'has_smartphone': fs_has_smartphone,
+                    'phone_type': fs_phone_type,
+                    'prior_wearable': fs_prior_wearable,
+                    'prior_wearable_model': fs_prior_model,
+                    'tech_comfort': fs_tech_comfort,
+                }])
+                if FULL_SURVEY_CSV.exists():
+                    old = pd.read_csv(FULL_SURVEY_CSV)
+                    old = old[old['study_id'].astype(str) != fs_study_id.strip()]
+                    rec = pd.concat([old, rec], ignore_index=True)
+                rec.to_csv(FULL_SURVEY_CSV, index=False)
+                st.success('Full survey response saved.')
+            except Exception as e:
+                st.error(f'Failed to save full survey: {e}')
+
+    if FULL_SURVEY_CSV.exists():
+        try:
+            fs_df = pd.read_csv(FULL_SURVEY_CSV)
+            st.dataframe(fs_df)
+            st.download_button('Download full survey (CSV)', data=fs_df.to_csv(index=False).encode('utf-8'), file_name='sociodemographic_survey.csv', mime='text/csv')
+        except Exception:
+            st.warning('Could not load existing full survey responses.')
 
 # Review tables and downloads
 with st.expander('Review & downloads'):
