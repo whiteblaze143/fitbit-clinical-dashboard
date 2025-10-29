@@ -102,6 +102,8 @@ Navigate the dashboard:
 - **Waveforms Tab**: Analyze individual ECG recordings
 - **Compliance Tab**: Monitor adherence metrics
 - **Participants Tab**: Manage enrollment
+- **Pilot Context**: The dashboard supports a pilot feasibility study design and generalizes intermittent clinical-grade patch monitoring (e.g., external patch monitor).
+- **Acceptability Survey**: After monitoring, capture usability and equity insights. See `docs/ACCEPTABILITY_SURVEY.md`.
 
 ---
 

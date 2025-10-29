@@ -80,7 +80,7 @@ st.markdown("""
 st.markdown("""
 <div class="main-header">
     <h1>🏥 Fitbit Clinical Dashboard</h1>
-    <p style="margin: 0; opacity: 0.9;">AFib Monitoring Study • Multi-Participant Management</p>
+    <p style="margin: 0; opacity: 0.9;">Pilot Feasibility Study • AFib Monitoring</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -114,6 +114,57 @@ with col4:
 
 st.markdown("---")
 
+# Study protocol highlights and contacts (per supervisor email chain)
+with st.expander("Study protocol and contacts"):
+    col_a, col_b = st.columns([2, 1])
+    with col_a:
+        st.markdown("""
+        **Short Title**: FitBit ECG Study  
+        **Protocol**: Evaluation of Fitbit Monitoring to Detect Recurrent AF  
+        **Version**: 1.1  
+        **Date**: October 21, 2025
+
+        - Single-centre pilot feasibility cohort at Sunnybrook Health Sciences Centre
+        - Two arms: post-ablation and post-cardioversion (initial target: 10 + 10)
+        - Daily smartwatch ECG for up to 6 months or until AF recurrence
+        - Intermittent clinical monitoring at ~3 and ~6 months (e.g., external patch monitor)
+        - All data stored locally on a Sunnybrook password-protected workstation
+        """)
+    with col_b:
+        st.markdown("""
+        **Primary Contact**  
+        Dr. Christopher Cheung  
+        Email: christopher.cheung@sunnybrook.ca  
+        Phone: 416-480-4746
+
+        **Secondary Contact**  
+        Mithun Manivannan  
+        Email: mithun.manivannan@sri.utoronto.ca
+        """)
+
+    st.info("DRAFT PROTOCOL - DO NOT DISTRIBUTE")
+
+# Time-to-detection definition and monitoring policy
+with st.expander("Outcome definitions and monitoring policy"):
+    if 'ttd_definition' not in st.session_state:
+        st.session_state['ttd_definition'] = 'Device-detected (smartwatch)'
+    st.markdown("**Primary outcome**: time to AF detection using smartwatch vs. conventional monitoring.")
+    st.session_state['ttd_definition'] = st.radio(
+        "Define time-to-detection as:",
+        options=[
+            'Device-detected (smartwatch event time)',
+            'Clinician-notified (time of investigator/clinician review)'
+        ],
+        index=0,
+        help="This selection is saved for exports and reports."
+    )
+    st.caption(f"Selected definition: {st.session_state['ttd_definition']}")
+    st.markdown("""
+    **Review cadence**: Data reviewed on a regular schedule (e.g., weekly) by the study team.  
+    **Notification**: Treating EP physicians may receive summaries per protocol.  
+    **Acceptability**: Track wear time, data availability, usability feedback.
+    """)
+
 # Study Overview Metrics
 st.markdown("### 📊 Study Overview")
 col1, col2, col3, col4, col5 = st.columns(5)
@@ -125,12 +176,12 @@ with col1:
 with col2:
     # Count ablation arm (assuming studyId pattern like ABL01, ABL02...)
     ablation_count = len([p for p in available_participants if 'ABL' in p.upper() or 'A' == p[0].upper()])
-    st.metric("Ablation Arm", f"{ablation_count}/10", help="Target: 10 participants")
+    st.metric("Ablation Arm (pilot)", f"{ablation_count}/10", help="Pilot target: 10 participants")
 
 with col3:
     # Count cardioversion arm (assuming studyId pattern like CVR01, CVR02...)
     cardioversion_count = len([p for p in available_participants if 'CVR' in p.upper() or 'C' == p[0].upper()])
-    st.metric("Cardioversion Arm", f"{cardioversion_count}/10", help="Target: 10 participants")
+    st.metric("Cardioversion Arm (pilot)", f"{cardioversion_count}/10", help="Pilot target: 10 participants")
 
 with col4:
     # Check for recent data (within last 2 days)
@@ -556,6 +607,54 @@ if not daily.empty:
                     st.line_chart(hrv.set_index('date')['rmssd'])
         except Exception:
             pass
+
+# Acceptability and usability survey (pilot feasibility)
+SURVEY_CSV = APP_DATA_DIR / 'acceptability_survey.csv'
+with st.expander('Acceptability & usability survey (optional)'):
+    st.markdown("""
+    Use this lightweight form to collect pilot feedback after monitoring. Do not include PHI; use study IDs only.
+    """)
+    col1, col2 = st.columns(2)
+    with col1:
+        study_id = st.text_input('Study ID (e.g., ABL01/CVR01)', value='')
+        wear_days = st.number_input('Estimated wear days over period', min_value=0, max_value=200, value=0, step=1)
+        daily_ecg_freq = st.selectbox('Daily ECG adherence', ['<25%', '25-50%', '50-75%', '75-90%', '>90%'])
+    with col2:
+        ease_use = st.select_slider('Ease of use (1=hard, 5=easy)', options=[1,2,3,4,5], value=4)
+        tech_issues = st.multiselect('Any technical issues encountered?', ['Pairing', 'Battery', 'App navigation', 'ECG app use', 'Syncing', 'Other'])
+        skin_tone = st.selectbox('Skin tone (Fitzpatrick-like self-report)', ['Prefer not to say','I-II','III-IV','V-VI'])
+    comments = st.text_area('Comments (optional)', value='')
+    if st.button('Save survey response'):
+        if not study_id.strip():
+            st.warning('Study ID is required to save a survey response.')
+        else:
+            try:
+                rec = pd.DataFrame([{
+                    'study_id': study_id.strip(),
+                    'wear_days': int(wear_days),
+                    'daily_ecg_freq': daily_ecg_freq,
+                    'ease_use': int(ease_use),
+                    'tech_issues': ';'.join(tech_issues) if tech_issues else '',
+                    'skin_tone': skin_tone,
+                    'comments': comments,
+                }])
+                if SURVEY_CSV.exists():
+                    old = pd.read_csv(SURVEY_CSV)
+                    # de-duplicate by study_id (keep latest)
+                    old = old[old['study_id'].astype(str) != study_id.strip()]
+                    rec = pd.concat([old, rec], ignore_index=True)
+                rec.to_csv(SURVEY_CSV, index=False)
+                st.success('Survey response saved.')
+            except Exception as e:
+                st.error(f'Failed to save survey: {e}')
+
+    if SURVEY_CSV.exists():
+        try:
+            s = pd.read_csv(SURVEY_CSV)
+            st.dataframe(s)
+            st.download_button('Download survey responses (CSV)', data=s.to_csv(index=False).encode('utf-8'), file_name='acceptability_survey.csv', mime='text/csv')
+        except Exception:
+            st.warning('Could not load existing survey responses.')
 
 # Review tables and downloads
 with st.expander('Review & downloads'):

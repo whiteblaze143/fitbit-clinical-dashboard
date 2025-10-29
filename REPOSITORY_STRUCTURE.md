@@ -29,6 +29,7 @@ fitbit-clinical-dashboard/
 │
 ├── 📚 docs/                         # Documentation
 │   ├── SETUP_GUIDE.md               # Comprehensive setup instructions
+│   ├── ACCEPTABILITY_SURVEY.md      # Post-monitoring usability & equity survey (pilot)
 │   ├── STUDY_PROTOCOL.md            # Clinical study protocol (to be added)
 │   └── DATA_DICTIONARY.md           # Data field descriptions (to be added)
 │

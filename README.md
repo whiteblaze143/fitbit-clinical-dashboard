@@ -1,6 +1,6 @@
-# 🏥 Fitbit Clinical Dashboard
+# 🏥 Fitbit Clinical Dashboard — Pilot Feasibility Study
 
-**Multi-Participant AFib Monitoring System for Clinical Studies**
+**Multi-Participant AFib Monitoring System for Clinical Studies (pilot feasibility)**
 
 A comprehensive dashboard for managing and analyzing Fitbit ECG data from multiple participants in clinical atrial fibrillation (AFib) monitoring studies.
 
@@ -8,7 +8,7 @@ A comprehensive dashboard for managing and analyzing Fitbit ECG data from multip
 
 ## 📋 Overview
 
-This dashboard was developed for the **Sunnybrook Health Sciences Centre AFib Monitoring Clinical Study**, enabling researchers to:
+This dashboard was developed for the **Sunnybrook Health Sciences Centre AFib Monitoring Pilot Feasibility Study**, enabling researchers to:
 
 - Monitor **20 participants** (10 ablation + 10 cardioversion arms)
 - Track **daily ECG compliance** and adherence metrics
@@ -19,7 +19,7 @@ This dashboard was developed for the **Sunnybrook Health Sciences Centre AFib Mo
 
 ---
 
-## 🎯 Study Design
+## 🎯 Study Design (Pilot Feasibility)
 
 | Arm | Participants | Monitoring Period | Target Adherence |
 |-----|--------------|-------------------|------------------|
@@ -270,4 +270,18 @@ This software is developed for research purposes only. Not for clinical use with
 **Version**: 1.0.0  
 **Last Updated**: October 2025  
 **Status**: Active Development
+
+---
+
+## 🧪 Pilot-Specific Details per Supervisor Guidance
+
+- **Framing**: This is a pilot feasibility cohort at Sunnybrook; initial target enrollment is 20 participants (10 ablation + 10 cardioversion).
+- **Intermittent Clinical Monitoring**: References to specific vendors are generalized as “intermittent clinical-grade patch monitoring (e.g., external patch monitor)” at approximately 3 and 6 months.
+- **Primary Outcome (clarified)**: Time to AF detection comparing smartwatch and conventional monitoring. We record two timestamps for analysis:
+  - Device-detected time: first smartwatch-detected AF event (ECG app or irregular rhythm notification).
+  - Clinician-notified time: first documented investigator/clinician notification based on any device/report.
+  Both will be captured; analyses may report either or both depending on protocol.
+- **Monitoring Responsibility**: The research team reviews the Fitbit dashboard on a regular cadence (e.g., weekly). Treating electrophysiologists may receive summaries as needed per protocol.
+- **Acceptability & Equity**: Collect usability and acceptability feedback post-monitoring, including optional equity considerations (e.g., self-reported skin tone as a proxy for PPG-related accuracy considerations).
+- **Survey**: See `docs/ACCEPTABILITY_SURVEY.md` for a lightweight post-monitoring survey instrument.
 
