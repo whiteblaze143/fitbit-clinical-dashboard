@@ -637,6 +637,17 @@ with st.expander('Acceptability & usability survey (optional)'):
         except Exception:
             st.warning('Could not load existing survey responses.')
 
+# Skin tone visual reference (Fitzpatrick-like)
+with st.expander('Skin tone reference (Fitzpatrick-like)'):
+    try:
+        img_path = Path(__file__).resolve().parent / 'fitz_scale.jpg'
+        if img_path.exists():
+            st.image(str(img_path), caption='Fitzpatrick-like self-report reference (for optional survey item)', use_column_width=True)
+        else:
+            st.info('Reference image not found: dashboard/fitz_scale.jpg')
+    except Exception:
+        st.info('Unable to load reference image on this machine.')
+
 # Review tables and downloads
 with st.expander('Review & downloads'):
     cols = st.columns(2)
