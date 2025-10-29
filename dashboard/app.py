@@ -144,26 +144,7 @@ with st.expander("Study protocol and contacts"):
 
     st.info("DRAFT PROTOCOL - DO NOT DISTRIBUTE")
 
-# Time-to-detection definition and monitoring policy
-with st.expander("Outcome definitions and monitoring policy"):
-    if 'ttd_definition' not in st.session_state:
-        st.session_state['ttd_definition'] = 'Device-detected (smartwatch)'
-    st.markdown("**Primary outcome**: time to AF detection using smartwatch vs. conventional monitoring.")
-    st.session_state['ttd_definition'] = st.radio(
-        "Define time-to-detection as:",
-        options=[
-            'Device-detected (smartwatch event time)',
-            'Clinician-notified (time of investigator/clinician review)'
-        ],
-        index=0,
-        help="This selection is saved for exports and reports."
-    )
-    st.caption(f"Selected definition: {st.session_state['ttd_definition']}")
-    st.markdown("""
-    **Review cadence**: Data reviewed on a regular schedule (e.g., weekly) by the study team.  
-    **Notification**: Treating EP physicians may receive summaries per protocol.  
-    **Acceptability**: Track wear time, data availability, usability feedback.
-    """)
+#
 
 # Study Overview Metrics
 st.markdown("### 📊 Study Overview")
