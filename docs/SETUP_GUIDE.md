@@ -12,6 +12,8 @@ Complete step-by-step instructions for setting up the dashboard for your clinica
 5. [First Data Export](#first-data-export)
 6. [Dashboard Access](#dashboard-access)
 7. [Troubleshooting](#troubleshooting)
+8. [Clinical Monitoring Context](#clinical-monitoring-context)
+9. [Outcome Definitions](#outcome-definitions)
 
 ---
 
@@ -343,6 +345,26 @@ cat fitbit/config.py
 
 # Ensure CLIENT_ID and CLIENT_SECRET match Fitbit dev portal
 ```
+
+---
+
+## Clinical Monitoring Context
+
+- This project is framed as a pilot feasibility cohort.
+- Intermittent clinical monitoring is generalized as **intermittent clinical-grade patch monitoring** (e.g., external patch monitor) typically around 3 and 6 months. Vendor may vary.
+- The research team reviews Fitbit dashboard data on a regular cadence (e.g., weekly) and may provide summaries to treating EP physicians as needed per protocol.
+
+---
+
+## Outcome Definitions
+
+**Primary outcome**: time to AF detection comparing smartwatch and conventional monitoring.
+
+To support analysis flexibility, capture both timestamps when available:
+- **Device-detected time**: first smartwatch-detected AF event (Fitbit ECG or irregular rhythm notification).
+- **Clinician-notified time**: first investigator/clinician notification based on any device/report.
+
+The operational definition used in the dashboard can be selected in-app (see the “Outcome definitions and monitoring policy” panel).
 
 ---
 
