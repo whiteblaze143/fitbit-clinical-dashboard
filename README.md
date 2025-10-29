@@ -273,15 +273,3 @@ This software is developed for research purposes only. Not for clinical use with
 
 ---
 
-## 🧪 Pilot-Specific Details per Supervisor Guidance
-
-- **Framing**: This is a pilot feasibility cohort at Sunnybrook; initial target enrollment is 20 participants (10 ablation + 10 cardioversion).
-- **Intermittent Clinical Monitoring**: References to specific vendors are generalized as “intermittent clinical-grade patch monitoring (e.g., external patch monitor)” at approximately 3 and 6 months.
-- **Primary Outcome (clarified)**: Time to AF detection comparing smartwatch and conventional monitoring. We record two timestamps for analysis:
-  - Device-detected time: first smartwatch-detected AF event (ECG app or irregular rhythm notification).
-  - Clinician-notified time: first documented investigator/clinician notification based on any device/report.
-  Both will be captured; analyses may report either or both depending on protocol.
-- **Monitoring Responsibility**: The research team reviews the Fitbit dashboard on a regular cadence (e.g., weekly). Treating electrophysiologists may receive summaries as needed per protocol.
-- **Acceptability & Equity**: Collect usability and acceptability feedback post-monitoring, including optional equity considerations (e.g., self-reported skin tone as a proxy for PPG-related accuracy considerations).
-- **Survey**: See `docs/ACCEPTABILITY_SURVEY.md` for a lightweight post-monitoring survey instrument.
-
