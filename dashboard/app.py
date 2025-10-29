@@ -142,7 +142,7 @@ with st.expander("Study protocol and contacts"):
         Email: mithun.manivannan@sri.utoronto.ca
         """)
 
-    st.info("Framed as a pilot feasibility study per supervisor guidance; intermittent monitoring is not restricted to a specific vendor.")
+    st.info("DRAFT PROTOCOL - DO NOT DISTRIBUTE")
 
 # Time-to-detection definition and monitoring policy
 with st.expander("Outcome definitions and monitoring policy"):
