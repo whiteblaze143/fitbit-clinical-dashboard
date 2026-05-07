@@ -280,3 +280,4 @@ secrets.json
 # Configuration templates
 !fitbit/config.py.example
 
+apps/app_data/dashboard.db
