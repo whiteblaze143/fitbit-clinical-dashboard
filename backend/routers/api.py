@@ -102,62 +102,62 @@ def bandpass_filter(sig, fs):
     except Exception:
         return sig
 
-@router.get("/data/waveform/{participant_id}/{stable_ecg_id}")
-def get_waveform(participant_id: str, stable_ecg_id: str, start_sec: float = 0, window_sec: float = 10, unit: str = 'mV', apply_filter: bool = False, fs: float = 250.0):
-    df = get_waveform_data(participant_id, stable_ecg_id, fs)
-    if df is None:
-        raise HTTPException(status_code=404, detail="Waveform not found")
+class WaveformAnalyzer:
+    def __init__(self, df, fs: float, unit: str):
+        self.df = df
+        self.fs = fs
+        self.unit = unit
 
-    # Standardize time and amplitude arrays
-    if 'timeSec' in df.columns:
-        t = df['timeSec'].to_numpy()
-        if unit in ('mV', 'µV') and 'mV' in df.columns:
-            v = df['mV'].to_numpy()
-            if unit == 'µV':
-                v = v * 1000.0
-        elif 'value' in df.columns:
-            v = df['value'].to_numpy()
+    def _extract_time_and_amplitude(self):
+        df = self.df
+        fs = self.fs
+        unit = self.unit
+
+        if 'timeSec' in df.columns:
+            t = df['timeSec'].to_numpy()
+            if unit in ('mV', 'µV') and 'mV' in df.columns:
+                v = df['mV'].to_numpy()
+                if unit == 'µV':
+                    v = v * 1000.0
+            elif 'value' in df.columns:
+                v = df['value'].to_numpy()
+            else:
+                num_df = df.select_dtypes(include=[np.number])
+                v = num_df.iloc[:, 1].to_numpy() if num_df.shape[1] >= 2 else df[df.columns[1]].to_numpy()
         else:
-            num_df = df.select_dtypes(include=[np.number])
-            v = num_df.iloc[:, 1].to_numpy() if num_df.shape[1] >= 2 else df[df.columns[1]].to_numpy()
-    else:
-        if unit == 'mV' and 'mV' in df.columns:
-            v = df['mV'].to_numpy()
-        elif unit == 'µV' and 'mV' in df.columns:
-            v = df['mV'].to_numpy() * 1000.0
-        elif 'value' in df.columns:
-            v = df['value'].to_numpy()
-        else:
-            v = df.select_dtypes(include=[np.number]).iloc[:, 0].to_numpy()
-        t = np.arange(len(v)) / fs
+            if unit == 'mV' and 'mV' in df.columns:
+                v = df['mV'].to_numpy()
+            elif unit == 'µV' and 'mV' in df.columns:
+                v = df['mV'].to_numpy() * 1000.0
+            elif 'value' in df.columns:
+                v = df['value'].to_numpy()
+            else:
+                v = df.select_dtypes(include=[np.number]).iloc[:, 0].to_numpy()
+            t = np.arange(len(v)) / fs
 
-    # Slicing
-    total_sec = len(v) / fs
-    s0 = int(start_sec * fs)
-    s1 = int(min(len(v), s0 + int(window_sec * fs)))
+        return t, v
 
-    t_seg = t[s0:s1]
-    v_seg = v[s0:s1]
+    def _get_segment(self, t, v, start_sec: float, window_sec: float):
+        total_sec = len(v) / self.fs
+        s0 = int(start_sec * self.fs)
+        s1 = int(min(len(v), s0 + int(window_sec * self.fs)))
 
-    if apply_filter and unit == 'mV':
-        v_seg = bandpass_filter(v_seg - np.median(v_seg), fs)
+        t_seg = t[s0:s1]
+        v_seg = v[s0:s1]
+        return t_seg, v_seg, total_sec
 
-    # Peak detection
-    peaks = []
-    hr = None
-    rmssd = None
-    sdnn = None
-    pnn50 = None
+    def _detect_peaks(self, v_seg):
+        if not (len(v_seg) > int(2 * self.fs)):
+            return []
 
-    if len(v_seg) > int(2 * fs):
         if HAS_SCIPY:
-            distance = int(0.25 * fs)
+            distance = int(0.25 * self.fs)
             prominence = max(0.1, float(np.std(v_seg) * 0.5))
             peak_indices, _ = find_peaks(v_seg, distance=distance, prominence=prominence)
         else:
             thr = np.percentile(np.abs(v_seg), 85)
             cand = np.where((v_seg[1:-1] > thr) & (v_seg[1:-1] > v_seg[:-2]) & (v_seg[1:-1] > v_seg[2:]))[0] + 1
-            refractory = int(0.25 * fs)
+            refractory = int(0.25 * self.fs)
             sel, last = [], -refractory
             for p in cand:
                 if p - last >= refractory:
@@ -165,11 +165,16 @@ def get_waveform(participant_id: str, stable_ecg_id: str, start_sec: float = 0, 
                     last = p
             peak_indices = np.array(sel)
 
-        peaks = peak_indices.tolist()
+        return peak_indices
 
-        # Metrics
+    def _calculate_metrics(self, peak_indices):
+        hr = None
+        rmssd = None
+        sdnn = None
+        pnn50 = None
+
         if len(peak_indices) >= 3:
-            rr = np.diff(peak_indices) / fs
+            rr = np.diff(peak_indices) / self.fs
             if len(rr) >= 2:
                 hr = float(60.0 / np.mean(rr)) if np.mean(rr) > 0 else None
                 sdnn = float(np.std(rr, ddof=1) * 1000.0)
@@ -177,18 +182,42 @@ def get_waveform(participant_id: str, stable_ecg_id: str, start_sec: float = 0, 
                 rmssd = float(np.sqrt(np.mean(diff_rr**2)) * 1000.0)
                 pnn50 = float(np.mean(np.abs(diff_rr) > 0.05) * 100.0)
 
-    return {
-        "time": t_seg.tolist(),
-        "amplitude": v_seg.tolist(),
-        "peaks": peaks,
-        "metrics": {
-            "hr": hr,
-            "rmssd": rmssd,
-            "sdnn": sdnn,
-            "pnn50": pnn50
-        },
-        "total_sec": total_sec
-    }
+        return hr, rmssd, sdnn, pnn50
+
+    def process(self, start_sec: float, window_sec: float, apply_filter: bool):
+        t, v = self._extract_time_and_amplitude()
+        t_seg, v_seg, total_sec = self._get_segment(t, v, start_sec, window_sec)
+
+        if apply_filter and self.unit == 'mV':
+            v_seg = bandpass_filter(v_seg - np.median(v_seg), self.fs)
+
+        peak_indices = self._detect_peaks(v_seg)
+        peaks = peak_indices.tolist() if isinstance(peak_indices, np.ndarray) else list(peak_indices)
+
+        hr, rmssd, sdnn, pnn50 = self._calculate_metrics(peak_indices)
+
+        return {
+            "time": t_seg.tolist(),
+            "amplitude": v_seg.tolist(),
+            "peaks": peaks,
+            "metrics": {
+                "hr": hr,
+                "rmssd": rmssd,
+                "sdnn": sdnn,
+                "pnn50": pnn50
+            },
+            "total_sec": total_sec
+        }
+
+
+@router.get("/data/waveform/{participant_id}/{stable_ecg_id}")
+def get_waveform(participant_id: str, stable_ecg_id: str, start_sec: float = 0, window_sec: float = 10, unit: str = 'mV', apply_filter: bool = False, fs: float = 250.0):
+    df = get_waveform_data(participant_id, stable_ecg_id, fs)
+    if df is None:
+        raise HTTPException(status_code=404, detail="Waveform not found")
+
+    analyzer = WaveformAnalyzer(df, fs, unit)
+    return analyzer.process(start_sec, window_sec, apply_filter)
 
 # App DB Routes
 class ArtifactUpdate(BaseModel):
