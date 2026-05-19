@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react"
 import Layout from "../components/Layout"
 import axios from "axios"
-import Plot from 'react-plotly.js'
+import Plotly from 'plotly.js-dist-min'
+import createPlotlyComponent from 'react-plotly.js/factory'
+
+const createPlotlyComponentFactory = (createPlotlyComponent as any).default || createPlotlyComponent
+const Plot = createPlotlyComponentFactory(Plotly)
 
 export default function Waveforms() {
   const [indexData, setIndexData] = useState<any[]>([])
